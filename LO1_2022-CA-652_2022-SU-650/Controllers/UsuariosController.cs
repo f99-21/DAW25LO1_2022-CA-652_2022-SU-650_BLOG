@@ -124,7 +124,7 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GetN/{n}")]
-        public IActionResult UsuarioConComentarios(int n) 
+        public IActionResult UsuarioConComentarios(int n)
         {
             var listUsuario = (from u in _usuariosContxt.usuarios
                                select new
@@ -132,15 +132,46 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
                                    u.nombreUsuario,
                                    u.nombre,
                                    CantidadComentarios = (from co in _usuariosContxt.comentarios
-                                                  where co.usuarioId == u.usuarioId
-                                                  select co).Count()
+                                                          where co.usuarioId == u.usuarioId
+                                                          select co).Count()
                                }).OrderByDescending(res => res.CantidadComentarios).Take(n).ToList();
 
             return Ok(listUsuario);
         }
 
+        [HttpGet]
+        [Route("GetByRol/{rol}")]
+        public IActionResult UsuariosRol(string rol)
+        {
+            var listUsuario = (from u in _usuariosContxt.usuarios
+                               join r in _usuariosContxt.roles on u.rolId equals r.rolId
+                               where r.rol == rol
+                               select new
+                               {
+                                   u.nombre,
+                                   u.apellido
+                               }).ToList();
 
+            return Ok(listUsuario);
 
 
         }
+
+        [HttpGet]
+        [Route("GetByNombre/{nombre}/{apellido}")]
+        public IActionResult UsuariosNombreApellido(string nombre, string apellido)
+        {
+            var listUsuario = (from u in _usuariosContxt.usuarios
+                               where u.nombre == nombre && u.apellido == apellido
+                               select new
+                               {
+                                   u.usuarioId,
+                                   u.rolId,
+                                   u.nombreUsuario,
+                                   u.clave,
+                               }).ToList();
+
+            return Ok(listUsuario);
+        }
+    }
 }
