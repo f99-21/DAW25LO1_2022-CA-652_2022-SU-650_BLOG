@@ -111,5 +111,29 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
 
         }
 
+        /// <summary>
+        /// EndPoint para filtrar comentarios por un usuario
+        /// </summary>
+        /// <param name="usuarioId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetByUsuario/{usuarioId}")]
+        public IActionResult GetByUsuario(int usuarioId) 
+        {
+            var comentariosDeUsuario = (from u in _comentariosContext.usuarios
+                                        where u.usuarioId == usuarioId
+                                        select new
+                                        {
+                                            u.usuarioId,
+                                            Comentarios = (from c in _comentariosContext.comentarios
+                                                           where c.usuarioId == u.usuarioId
+                                                           select c.comentario).ToList()
+                                        }).FirstOrDefault();
+
+            if (comentariosDeUsuario == null) return NotFound();
+
+            return Ok(comentariosDeUsuario);
+        }
+
     }
 }
