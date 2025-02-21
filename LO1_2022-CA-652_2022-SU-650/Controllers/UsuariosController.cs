@@ -84,7 +84,7 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
 
             if (usuarioActual == null) { return NotFound(); }
 
-            //sie encuentra registro se modifican los campos
+            //si se encuentra registro se modifican los campos
 
 
             usuarioActual.nombreUsuario = usuarioModificado.nombreUsuario;

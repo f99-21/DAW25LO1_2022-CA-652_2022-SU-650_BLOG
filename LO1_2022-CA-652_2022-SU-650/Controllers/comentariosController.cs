@@ -35,16 +35,17 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
         // buscar comenatarios por id
         [HttpGet]
         [Route("GetByID/{id}")]
-
         public IActionResult Get(int id)
         {
             comentarios? comentarios = (from c in _comentariosContext.comentarios
                                         where c.cometarioId == id
                                         select c).FirstOrDefault();
+
             if (comentarios == null)
             {
                 return NotFound();
             }
+
             return Ok(comentarios);
 
         }
@@ -52,7 +53,6 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
         //agregar comentarios
         [HttpPost]
         [Route("Agregar")]
-
         public IActionResult GuardaUsuario([FromBody] comentarios comentarios)
         {
             try
@@ -73,19 +73,19 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
         // modifica registros de comenatarios
         [HttpPut]
         [Route("Modificar/{id}")]
-
         public IActionResult ModificarComenatrio(int id, [FromBody] comentarios comenatarioModificar)
         {
-         comentarios? comentarioActul = (from c in _comentariosContext.comentarios
+            comentarios? comentarioActul = (from c in _comentariosContext.comentarios
                                     where c.cometarioId == id
                                     select c).FirstOrDefault();
+
             if (comentarioActul == null) { return NotFound(); }
 
-           comentarioActul.publicacionId = comenatarioModificar.publicacionId;
-           comentarioActul.comentario = comenatarioModificar.comentario;
-           comentarioActul.usuarioId = comenatarioModificar.usuarioId;
+            comentarioActul.publicacionId = comenatarioModificar.publicacionId;
+            comentarioActul.comentario = comenatarioModificar.comentario;
+            comentarioActul.usuarioId = comenatarioModificar.usuarioId;
 
-          _comentariosContext.Entry(comentarioActul).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            _comentariosContext.Entry(comentarioActul).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _comentariosContext.SaveChanges();
 
             return Ok (comenatarioModificar);
@@ -94,7 +94,6 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
         //eliminar registro
         [HttpDelete]
         [Route("Eliminar/{id}")]
-
         public IActionResult Eliminar(int id)
         {
             comentarios? comentario = (from c in _comentariosContext.comentarios
@@ -106,6 +105,7 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
             _comentariosContext.comentarios.Attach(comentario);
             _comentariosContext.Remove(comentario);
             _comentariosContext.SaveChanges();
+
             return Ok (comentario);
 
 
