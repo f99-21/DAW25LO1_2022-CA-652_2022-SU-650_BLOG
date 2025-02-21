@@ -123,5 +123,30 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
             return Ok(calificacion);
         }
 
+        /// <summary>
+        /// EndPoint para filtrar calificaciones por una publicacion
+        /// </summary>
+        /// <param name="publicacionId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetByPublicacion/{publicacionId}")]
+        public IActionResult GetByPublicacion(int publicacionId) 
+        {
+            var calificacionesDePublicacion = (from p in _calificacionesContext.publicaciones
+                                               where p.publicacionId == publicacionId
+                                               select new
+                                               {
+                                                   p.titulo,
+                                                   Calificaciones = (from c in _calificacionesContext.calificaciones
+                                                                  where c.publicacionId == p.publicacionId
+                                                                  select c.calificacion).ToList()
+                                               }).FirstOrDefault();
+
+            if (calificacionesDePublicacion == null) return NotFound();
+
+            return Ok(calificacionesDePublicacion);
+
+        }
+
     }
 }
