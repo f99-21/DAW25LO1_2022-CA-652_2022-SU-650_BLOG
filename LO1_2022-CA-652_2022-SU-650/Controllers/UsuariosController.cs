@@ -139,8 +139,8 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
             return Ok(listUsuario);
         }
 
-        
-        
 
-    }
+
+
+        }
 }
