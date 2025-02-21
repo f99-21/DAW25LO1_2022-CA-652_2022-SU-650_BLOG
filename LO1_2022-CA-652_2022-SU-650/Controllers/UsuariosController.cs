@@ -12,7 +12,7 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
 
         private readonly blogContext _usuariosContxt;
 
-        public UsuariosController (blogContext usuariosContxt)
+        public UsuariosController(blogContext usuariosContxt)
         {
             _usuariosContxt = usuariosContxt;
         }
@@ -30,13 +30,14 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
             {
                 return NotFound();
             }
-            return Ok (listaUsuaro);
+
+            return Ok(listaUsuaro);
 
         }
 
+
         [HttpGet]
         [Route("GetByID/{id}")]
-
         public IActionResult Get(int id)
         {
             usuarios? usuario = (from u in _usuariosContxt.usuarios
@@ -46,14 +47,15 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
             {
                 return NotFound();
             }
-            return Ok (usuario);
+
+            return Ok(usuario);
 
         }
 
+
         [HttpPost]
         [Route("Agregar")]
-
-        public IActionResult GuardaUsuario([FromBody]usuarios usuarios)
+        public IActionResult GuardaUsuario([FromBody] usuarios usuarios)
         {
             try
             {
@@ -62,45 +64,44 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
                 return Ok(usuarios);
 
             }
-            catch (Exception ex) 
-            { 
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
-            
+
             }
 
 
         }
 
         [HttpPut]
-        [Route ("modificar")]
+        [Route("modificar")]
+        public IActionResult Modificar(int id, [FromBody] usuarios usuarioModificado)
+        {
 
-        public IActionResult Modificar (int id , [FromBody]usuarios usuarioModificado)
-            {
+            usuarios? usuarioActual = (from u in _usuariosContxt.usuarios
+                                       where u.usuarioId == id
+                                       select u).FirstOrDefault();
 
-                usuarios? usuarioActual = (from u in _usuariosContxt.usuarios
-                                          where u.usuarioId == id
-                                          select u).FirstOrDefault();
-                if (usuarioActual == null)
-                { return NotFound(); }
+            if (usuarioActual == null) { return NotFound(); }
 
-                //sie encuentra registro se modifican los campos
+            //sie encuentra registro se modifican los campos
 
-               
-                usuarioActual.nombreUsuario= usuarioModificado.nombreUsuario;
-                usuarioActual.clave = usuarioModificado.clave;
-                usuarioActual.nombre = usuarioModificado.nombre;
-                usuarioActual.apellido = usuarioModificado.apellido;
 
-                _usuariosContxt.Entry(usuarioActual).State = EntityState.Modified;
-                _usuariosContxt.SaveChanges();
+            usuarioActual.nombreUsuario = usuarioModificado.nombreUsuario;
+            usuarioActual.clave = usuarioModificado.clave;
+            usuarioActual.nombre = usuarioModificado.nombre;
+            usuarioActual.apellido = usuarioModificado.apellido;
 
-                return Ok (usuarioModificado);
-            }
+            _usuariosContxt.Entry(usuarioActual).State = EntityState.Modified;
+            _usuariosContxt.SaveChanges();
+
+            return Ok(usuarioModificado);
+        }
+
 
         [HttpDelete]
         [Route("Eliminar/{id}")]
-
-        public IActionResult Eliminar(int id) 
+        public IActionResult Eliminar(int id)
         {
             usuarios? usuario = (from u in _usuariosContxt.usuarios
                                  where u.usuarioId == id
@@ -110,16 +111,32 @@ namespace LO1_2022_CA_652_2022_SU_650.Controllers
 
             _usuariosContxt.usuarios.Attach(usuario);
             _usuariosContxt.usuarios.Remove(usuario);
-            _usuariosContxt.SaveChanges ();
-            return NoContent ();
-         
-                    
+            _usuariosContxt.SaveChanges();
 
-                
-
-                
-
+            return Ok(usuario);
 
         }
+
+        /// <summary>
+        /// EndPoint para retornar Top N usuarios y su cantidad de comentarios
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetN/{n}")]
+        public IActionResult UsuarioConComentarios(int n) 
+        {
+            var listUsuario = (from u in _usuariosContxt.usuarios
+                               select new
+                               {
+                                   u.nombreUsuario,
+                                   u.nombre,
+                                   CantidadComentarios = (from co in _usuariosContxt.comentarios
+                                                  where co.usuarioId == u.usuarioId
+                                                  select co).Count()
+                               }).OrderByDescending(res => res.CantidadComentarios).Take(n).ToList();
+
+            return Ok(listUsuario);
+        } 
     }
 }
